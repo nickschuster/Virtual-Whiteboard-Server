@@ -1,0 +1,19 @@
+{
+  "name": "virtual-whiteboard-server",
+  "version": "1.0.0",
+  "description": "The server for the virtual-whiteboard app.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nickschuster/Virtual-Whiteboard-Server.git"
+  },
+  "author": "Schuster Software",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nickschuster/Virtual-Whiteboard-Server/issues"
+  },
+  "homepage": "https://github.com/nickschuster/Virtual-Whiteboard-Server#readme"
+}
