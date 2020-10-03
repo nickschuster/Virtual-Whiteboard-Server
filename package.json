@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/nickschuster/Virtual-Whiteboard-Server/issues"
   },
-  "homepage": "https://github.com/nickschuster/Virtual-Whiteboard-Server#readme"
+  "homepage": "https://github.com/nickschuster/Virtual-Whiteboard-Server#readme",
+  "dependencies": {
+    "socket.io": "^2.3.0"
+  }
 }
