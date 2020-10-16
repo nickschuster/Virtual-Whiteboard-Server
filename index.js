@@ -11,6 +11,7 @@ const SWITCH_EVENT = "switch_event"
 const DRAW_EVENT = "draw_event"
 
 const fs = require("fs")
+const { connected, exit } = require("process")
 
 const options = {
     key: fs.readFileSync("./.openssl/key.pem", "utf-8"),
@@ -27,10 +28,12 @@ console.log("VW Server Listening ... ")
 
 let activeCanvas;
 let mouseActivity;
+let connectedClients = 0
 
 io.on('connect', socket => {
 
     console.log("Connection.")
+    connectedClients += 1
 
     // Identify student or teacher
     // If student join student room
@@ -39,6 +42,7 @@ io.on('connect', socket => {
     // Send that data to all students
 
     socket.on(JOIN_EVENT, type => {
+        console.log("Connection: " + type)
         if(type === HOST) {
         } else if(type === CLIENT) {
             socket.join(STUDENT_ROOM)
@@ -57,4 +61,16 @@ io.on('connect', socket => {
         socket.to(STUDENT_ROOM).emit(DRAW_EVENT, clickData)
     })
 
+    socket.on("disconnect", reason => {
+        console.log("Disconnection: " + reason);
+        connectedClients -= 1;
+    })
 })
+
+setInterval(() => {
+    if(connectedClients === 0) {
+        console.log("No clients connected. Shutting down.")
+        io.close()
+        exit()
+    }
+}, 300000)
