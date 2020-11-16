@@ -9,6 +9,8 @@ const JOIN_EVENT = "join_event"
 const CREATE_EVENT = "create_event"
 const SWITCH_EVENT = "switch_event"
 const DRAW_EVENT = "draw_event"
+const RENAME_EVENT = "rename_event"
+const DELETE_EVENT = "delete_event"
 
 const fs = require("fs")
 const { connected, exit } = require("process")
@@ -32,8 +34,8 @@ let connectedClients = 0
 
 io.on('connect', socket => {
 
-    console.log("Connection.")
     connectedClients += 1
+    console.log("Connection. Total: " + connectedClients)
 
     // Identify student or teacher
     // If student join student room
@@ -42,23 +44,31 @@ io.on('connect', socket => {
     // Send that data to all students
 
     socket.on(JOIN_EVENT, type => {
-        console.log("Connection: " + type)
+        console.log("Connection: " + type);
         if(type === HOST) {
         } else if(type === CLIENT) {
-            socket.join(STUDENT_ROOM)
+            socket.join(STUDENT_ROOM);
         }
     })
 
     socket.on(CREATE_EVENT, () => {
-        socket.to(STUDENT_ROOM).emit(CREATE_EVENT)
+        socket.to(STUDENT_ROOM).emit(CREATE_EVENT);
     })
 
     socket.on(SWITCH_EVENT, canvasId => {
-        socket.to(STUDENT_ROOM).emit(SWITCH_EVENT, canvasId)
+        socket.to(STUDENT_ROOM).emit(SWITCH_EVENT, canvasId);
     })
 
     socket.on(DRAW_EVENT, clickData => {
-        socket.to(STUDENT_ROOM).emit(DRAW_EVENT, clickData)
+        socket.to(STUDENT_ROOM).emit(DRAW_EVENT, clickData);
+    })
+
+    socket.on(RENAME_EVENT, renameDetails => {
+        socket.to(STUDENT_ROOM).emit(RENAME_EVENT, renameDetails);
+    })
+
+    socket.on(DELETE_EVENT, canvasId => {
+        socket.to(STUDENT_ROOM).emit(DELETE_EVENT, canvasId);
     })
 
     socket.on("disconnect", reason => {
@@ -73,4 +83,4 @@ setInterval(() => {
         io.close()
         exit()
     }
-}, 300000)
+}, 30000)
