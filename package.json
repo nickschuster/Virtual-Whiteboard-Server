@@ -1,6 +1,6 @@
 {
   "name": "virtual-whiteboard-server",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "The server for the virtual-whiteboard app.",
   "main": "index.js",
   "scripts": {
