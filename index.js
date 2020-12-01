@@ -4,6 +4,7 @@
 
 const HOST = 1
 const CLIENT = 0
+const ROOM = "room"
 const STUDENT_ROOM = "student_room"
 const JOIN_EVENT = "join_event"
 const CREATE_EVENT = "create_event"
@@ -12,6 +13,8 @@ const DRAW_EVENT = "draw_event"
 const RENAME_EVENT = "rename_event"
 const DELETE_EVENT = "delete_event"
 const HISTORY_EVENT = "history_event"
+const ROOM_EVENT = "room_event"
+const QUESTION_EVENT = "question_event"
 
 const fs = require("fs")
 const { connected, exit } = require("process")
@@ -30,6 +33,8 @@ console.log("VW Server Listening ... ")
 // Room globals.
 
 let roomHistory = [];
+let roomList = [];
+let questionId = 0;
 let connectedClients = 0
 
 io.on('connect', socket => {
@@ -43,13 +48,15 @@ io.on('connect', socket => {
     // Everytime the teacher sends data
     // Send that data to all students
 
-    socket.on(JOIN_EVENT, type => {
-        console.log("Connection: " + type);
-        if(type === HOST) {
-        } else if(type === CLIENT) {
+    socket.on(JOIN_EVENT, joiner => {
+        console.log("Connection: " + joiner.type);
+        if(joiner.type === HOST) {
+        } else if(joiner.type === CLIENT) {
             socket.join(STUDENT_ROOM);
             sendHistory(socket)
         }
+        addToRoom(joiner, socket)
+        io.in(ROOM).emit(ROOM_EVENT, roomList)
     })
 
     socket.on(CREATE_EVENT, () => {
@@ -81,9 +88,19 @@ io.on('connect', socket => {
         sendHistory(socket)
     })
 
+    socket.on(QUESTION_EVENT, question => {
+        console.log()
+        questionId += 1
+        io.in(ROOM).emit(QUESTION_EVENT, {
+            questionId: questionId,
+            question: question
+        })
+    })
+
     socket.on("disconnect", reason => {
         console.log("Disconnection: " + reason);
         connectedClients -= 1;
+        removeFromRoom(socket.id, socket)
     })
 })
 
@@ -99,10 +116,30 @@ function sendHistory(socket) {
     }
 }
 
-setInterval(() => {
-    if(connectedClients === 0) {
-        console.log("No clients connected. Shutting down.")
-        io.close()
-        exit()
+// Add someone to the room.
+function addToRoom(joiner, socket) {
+    console.log(socket.id)
+    roomList.push({
+        id: socket.id,
+        joiner: joiner
+    })
+    socket.join(ROOM)
+}
+
+// Remove someone from the room.
+function removeFromRoom(id, socket) {
+    for(let i = 0; i < roomList.length; i++) {
+        if(roomList[i].id == id) {
+            roomList.splice(i, 1);
+        }
     }
-}, 30000)
+    socket.to(ROOM).emit(ROOM_EVENT, roomList)
+}
+
+// setInterval(() => {
+//     if(connectedClients === 0) {
+//         console.log("No clients connected. Shutting down.")
+//         io.close()
+//         exit()
+//     }
+// }, 30000)
