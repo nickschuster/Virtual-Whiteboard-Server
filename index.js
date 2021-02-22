@@ -136,10 +136,17 @@ function removeFromRoom(id, socket) {
     socket.to(ROOM).emit(ROOM_EVENT, roomList)
 }
 
-// setInterval(() => {
-//     if(connectedClients === 0) {
-//         console.log("No clients connected. Shutting down.")
-//         io.close()
-//         exit()
-//     }
-// }, 30000)
+// Check every 5 minute for connected clients.
+setInterval(() => {
+    if(connectedClients === 0) {
+        console.log("No clients connected. Shutting down.")
+        io.close()
+        exit()
+    }
+}, 300000)
+
+// Max room time is 30 minutes.
+setInterval(() => {
+    io.close();
+    exit();
+}, 1800000);
